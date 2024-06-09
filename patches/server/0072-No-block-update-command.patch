@@ -115,7 +115,7 @@ index 0000000000000000000000000000000000000000..819d5a5383dc6978f53645b727722fa9
 +
 +public class NoBlockUpdateCommand extends Command {
 +
-+    private static boolean noBlockUpdate = false;
++    private static boolean noBlockUpdate = true;
 +
 +    public NoBlockUpdateCommand(@NotNull String name) {
 +        super(name);
