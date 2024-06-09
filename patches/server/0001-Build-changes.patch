@@ -51,7 +51,7 @@ index bcfe59b6efb628ee1e7f9d60667360d4d885fb6a..dc25ca9011a4fa0fcb642aa7371b0693
              "Main-Class" to "org.bukkit.craftbukkit.Main",
              "Implementation-Title" to "CraftBukkit",
 -            "Implementation-Version" to "git-Paper-$implementationVersion",
-+            "Implementation-Version" to "git-Leaves-$implementationVersion",
++            "Implementation-Version" to "git-YMFS-$implementationVersion",
              "Implementation-Vendor" to date, // Paper
              "Specification-Title" to "Bukkit",
              "Specification-Version" to project.version,
@@ -161,7 +161,7 @@ index c8772c773f9933ed1d1debfe707af4373c458152..f9e5f9f309133ea5b540530dc7da96d0
      @DontObfuscate
      public String getServerModName() {
 -        return "Paper"; // Paper
-+        return top.leavesmc.leaves.LeavesConfig.serverModName; // Leaves - Leaves > //Paper
++        return "YMFS"; // Leaves - Leaves > //Paper
      }
  
      public SystemReport fillSystemReport(SystemReport details) {
@@ -191,7 +191,7 @@ index c490a29bcf7410bc54959ee71375605964379ed5..367975d5e0c9846e5ce6d9cbdc3a977c
  
  public final class CraftServer implements Server {
 -    private final String serverName = "Paper"; // Paper
-+    private final String serverName = "Leaves"; // Leaves // Paper
++    private final String serverName = "YMFS"; // Leaves // Paper
      private final String serverVersion;
      private final String bukkitVersion = Versioning.getBukkitVersion();
      private final Logger logger = Logger.getLogger("Minecraft");
