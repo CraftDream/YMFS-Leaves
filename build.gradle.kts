@@ -10,7 +10,7 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven("https://repo.leavesmc.top/releases") {
+    maven("https://repo.leavesmc.org/releases") {
         content { onlyForConfigurations("paperclip") }
     }
 }
