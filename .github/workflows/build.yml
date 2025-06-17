@@ -24,6 +24,12 @@ jobs:
           add-job-summary: never
           generate-job-summary: false
           cache-read-only: false
+      - name: Setup Git ConfigAdd commentMore actions
+        run: |
+          git config --global user.email "ci@leavesmc.org"
+          git config --global user.name "LeavesMC CI"
+      - name: Get Build Number
+        run: bash scripts/GetBuildNumber.sh
       - name: Apply Patches
         run: ./gradlew applyAllPatches
       - name: Create Leavesclip Jar
