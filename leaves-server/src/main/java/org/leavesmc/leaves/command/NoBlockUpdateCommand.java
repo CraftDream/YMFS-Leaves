@@ -16,7 +16,7 @@ import java.util.List;
 
 public class NoBlockUpdateCommand extends Command {
 
-    private static boolean noBlockUpdate = false;
+    private static boolean noBlockUpdate = true;
 
     public NoBlockUpdateCommand(@NotNull String name) {
         super(name);
