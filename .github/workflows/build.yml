@@ -8,7 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: github.repository == 'LeavesMC/Leaves'
     steps:
       - name: Get repository
         uses: actions/checkout@v4
