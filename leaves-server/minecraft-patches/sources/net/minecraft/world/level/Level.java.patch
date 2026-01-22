@@ -1,18 +1,11 @@
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
-@@ -1458,6 +_,7 @@
-     }
- 
-     protected void tickBlockEntities() {
-+        return;
-         ProfilerFiller profilerFiller = Profiler.get();
-         profilerFiller.push("blockEntities");
-         this.tickingBlockEntities = true;
-@@ -1472,7 +_,9 @@
+@@ -1472,7 +_,10 @@
          int tickedEntities = 0; // Paper - rewrite chunk system
          var toRemove = new it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet<TickingBlockEntity>(); // Paper - Fix MC-117075; use removeAll
          toRemove.add(null); // Paper - Fix MC-117075
 -        for (tileTickPosition = 0; tileTickPosition < this.blockEntityTickers.size(); tileTickPosition++) { // Paper - Disable tick limiters
++        int tilesThisCycle = 0;
 +        for (this.tileLimiter.initTick();
 +            tilesThisCycle < this.blockEntityTickers.size() && (tilesThisCycle % 10 != 0 || this.tileLimiter.shouldContinue());
 +            this.tileTickPosition++, tilesThisCycle++) {
