@@ -1,0 +1,21 @@
+--- a/net/minecraft/world/level/Level.java
++++ b/net/minecraft/world/level/Level.java
+@@ -1458,6 +_,7 @@
+     }
+ 
+     protected void tickBlockEntities() {
++        return;
+         ProfilerFiller profilerFiller = Profiler.get();
+         profilerFiller.push("blockEntities");
+         this.tickingBlockEntities = true;
+@@ -1472,7 +_,9 @@
+         int tickedEntities = 0; // Paper - rewrite chunk system
+         var toRemove = new it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet<TickingBlockEntity>(); // Paper - Fix MC-117075; use removeAll
+         toRemove.add(null); // Paper - Fix MC-117075
+-        for (tileTickPosition = 0; tileTickPosition < this.blockEntityTickers.size(); tileTickPosition++) { // Paper - Disable tick limiters
++        for (this.tileLimiter.initTick();
++            tilesThisCycle < this.blockEntityTickers.size() && (tilesThisCycle % 10 != 0 || this.tileLimiter.shouldContinue());
++            this.tileTickPosition++, tilesThisCycle++) {
+             this.tileTickPosition = (this.tileTickPosition < this.blockEntityTickers.size()) ? this.tileTickPosition : 0;
+             TickingBlockEntity tickingBlockEntity = this.blockEntityTickers.get(this.tileTickPosition);
+             // Spigot end
