@@ -17,7 +17,7 @@ import static net.kyori.adventure.text.format.NamedTextColor.AQUA;
 import static net.kyori.adventure.text.format.NamedTextColor.GRAY;
 
 public class BlockUpdateCommand extends LeavesSubcommand {
-    private static boolean noBlockUpdate = false;
+    private static boolean noBlockUpdate = true;
 
     public static boolean isNoBlockUpdate() {
         return LeavesConfig.modify.noBlockUpdateCommand && noBlockUpdate;
