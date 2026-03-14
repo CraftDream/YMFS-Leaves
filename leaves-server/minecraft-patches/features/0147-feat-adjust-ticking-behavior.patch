@@ -1,0 +1,207 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: CraftDream <47418954+CraftDream@users.noreply.github.com>
+Date: Sat, 14 Mar 2026 16:22:05 +0000
+Subject: [PATCH] feat: adjust ticking behavior
+
+
+diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
+index fa5d582843387e3846b70c01ac85c71e9031f2f1..637b40661d6dce27ea8bd033843f87aa2b999218 100644
+--- a/net/minecraft/server/level/ServerLevel.java
++++ b/net/minecraft/server/level/ServerLevel.java
+@@ -871,7 +871,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+             if (org.leavesmc.leaves.LeavesConfig.modify.elytraAeronautics.enableNoChunkLoad) {
+                 org.leavesmc.leaves.util.ElytraAeronauticsHelper.tick(this);
+             }
+-            this.tickBlockEntities();
++            // this.tickBlockEntities();
+             profilerFiller.pop();
+         }
+ 
+diff --git a/net/minecraft/world/entity/Mob.java b/net/minecraft/world/entity/Mob.java
+index e783710f312b8c7b97dfd227866b71cee45c4d21..a22692bed3e58b92eb9dcf1d2df8b1dba7928148 100644
+--- a/net/minecraft/world/entity/Mob.java
++++ b/net/minecraft/world/entity/Mob.java
+@@ -391,6 +391,8 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
+ 
+     @Override
+     public void tick() {
++        return;
++        /*
+         super.tick();
+         if (!this.level().isClientSide() && this.tickCount % 5 == 0) {
+             this.updateControlFlags();
+@@ -405,6 +407,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
+             part.handlePortal();
+         }
+         // Leaves end - ender dragon part can use end portal
++        */
+     }
+ 
+     protected void updateControlFlags() {
+diff --git a/net/minecraft/world/entity/vehicle/AbstractMinecart.java b/net/minecraft/world/entity/vehicle/AbstractMinecart.java
+index c8b053b01b06af6033b9a74452946333dbeb77fa..88c0ec3a658d40aa757f5e404da9bb49cb13b1f2 100644
+--- a/net/minecraft/world/entity/vehicle/AbstractMinecart.java
++++ b/net/minecraft/world/entity/vehicle/AbstractMinecart.java
+@@ -276,6 +276,8 @@ public abstract class AbstractMinecart extends VehicleEntity {
+ 
+     @Override
+     public void tick() {
++        return;
++        /*
+         // CraftBukkit start
+         double prevX = this.getX();
+         double prevY = this.getY();
+@@ -315,6 +317,7 @@ public abstract class AbstractMinecart extends VehicleEntity {
+         }
+ 
+         this.firstTick = false;
++        */
+     }
+ 
+     public boolean isFirstTick() {
+diff --git a/net/minecraft/world/entity/vehicle/MinecartTNT.java b/net/minecraft/world/entity/vehicle/MinecartTNT.java
+index 4dd4f55dbf585b82df34e294dc4ef0386ae29c1e..701a7f9ec1202a88ca70f798d01cf49b0701b475 100644
+--- a/net/minecraft/world/entity/vehicle/MinecartTNT.java
++++ b/net/minecraft/world/entity/vehicle/MinecartTNT.java
+@@ -53,6 +53,8 @@ public class MinecartTNT extends AbstractMinecart {
+ 
+     @Override
+     public void tick() {
++        return;
++        /*
+         super.tick();
+         if (this.fuse > 0) {
+             // Paper start - Configurable TNT height nerf
+@@ -73,6 +75,7 @@ public class MinecartTNT extends AbstractMinecart {
+                 this.explode(this.ignitionSource, d);
+             }
+         }
++        */
+     }
+ 
+     @Override
+diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Level.java
+index a8d8dce19cf780ecb8dd1025a36c642d50ee5f06..c5e4a17f07141646c8fe24ecb58d34c180db80a8 100644
+--- a/net/minecraft/world/level/Level.java
++++ b/net/minecraft/world/level/Level.java
+@@ -1423,6 +1423,8 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+     }
+ 
+     public void tickBlockEntities() {
++        return;
++        /*
+         this.tickingBlockEntities = true;
+         if (!this.pendingBlockEntityTickers.isEmpty()) {
+             this.blockEntityTickers.addAll(this.pendingBlockEntityTickers);
+@@ -1435,7 +1437,10 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+         int tickedEntities = 0; // Paper - rewrite chunk system
+         var toRemove = new it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet<TickingBlockEntity>(); // Paper - Fix MC-117075; use removeAll
+         toRemove.add(null); // Paper - Fix MC-117075
+-        for (this.tileTickPosition = 0; this.tileTickPosition < this.blockEntityTickers.size(); this.tileTickPosition++) { // Paper - Disable tick limiters
++        int tilesThisCycle = 0;
++        for (this.tileLimiter.initTick();
++            tilesThisCycle < this.blockEntityTickers.size() && (tilesThisCycle % 10 != 0 || this.tileLimiter.shouldContinue());
++            this.tileTickPosition++, tilesThisCycle++) {
+             TickingBlockEntity tickingBlockEntity = this.blockEntityTickers.get(this.tileTickPosition);
+             // Spigot end
+             if (tickingBlockEntity.isRemoved()) {
+@@ -1453,6 +1458,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+ 
+         this.tickingBlockEntities = false;
+         this.spigotConfig.currentPrimedTnt = 0; // Spigot
++        */
+     }
+ 
+     public <T extends Entity> void guardEntityTick(Consumer<T> action, T entity) {
+diff --git a/net/minecraft/world/level/block/AbstractFurnaceBlock.java b/net/minecraft/world/level/block/AbstractFurnaceBlock.java
+index 271a71aab53e206798c5e3a7be385da4e4f01e12..4844035e8174901860df14288de1676c336a3bcf 100644
+--- a/net/minecraft/world/level/block/AbstractFurnaceBlock.java
++++ b/net/minecraft/world/level/block/AbstractFurnaceBlock.java
+@@ -105,10 +105,13 @@ public abstract class AbstractFurnaceBlock extends BaseEntityBlock {
+     protected static <T extends BlockEntity> BlockEntityTicker<T> createFurnaceTicker(
+         Level level, BlockEntityType<T> serverType, BlockEntityType<? extends AbstractFurnaceBlockEntity> clientType
+     ) {
++        return null;
++        /*
+         return level instanceof ServerLevel serverLevel
+             ? createTickerHelper(
+                 serverType, clientType, (level1, pos, state, blockEntity) -> AbstractFurnaceBlockEntity.serverTick(serverLevel, pos, state, blockEntity)
+             )
+             : null;
++        */
+     }
+ }
+diff --git a/net/minecraft/world/level/block/HopperBlock.java b/net/minecraft/world/level/block/HopperBlock.java
+index 870df1a752e676fc8a6879250393c388496b1597..e6efc063e93066c4f68ccc1df090d358c18ffcb1 100644
+--- a/net/minecraft/world/level/block/HopperBlock.java
++++ b/net/minecraft/world/level/block/HopperBlock.java
+@@ -94,7 +94,10 @@ public class HopperBlock extends BaseEntityBlock implements org.leavesmc.leaves.
+     @Nullable
+     @Override
+     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
++        return null;
++        /*
+         return level.isClientSide() ? null : createTickerHelper(blockEntityType, BlockEntityType.HOPPER, HopperBlockEntity::pushItemsTick);
++        */
+     }
+ 
+     @Override
+@@ -199,6 +202,8 @@ public class HopperBlock extends BaseEntityBlock implements org.leavesmc.leaves.
+     }
+ 
+     private void updateHopper(net.minecraft.world.level.LevelReader world, BlockState myBlockState, BlockPos myPos, BlockPos posFrom) {
++        return;
++        /*
+         Direction facing = myBlockState.getValue(HopperBlock.FACING);
+         boolean above = posFrom.getY() == myPos.getY() + 1;
+         if (above || posFrom.getX() == myPos.getX() + facing.getStepX() && posFrom.getY() == myPos.getY() + facing.getStepY() && posFrom.getZ() == myPos.getZ() + facing.getStepZ()) {
+@@ -207,6 +212,7 @@ public class HopperBlock extends BaseEntityBlock implements org.leavesmc.leaves.
+                 updateReceiver.lithium$invalidateCacheOnNeighborUpdate(above);
+             }
+         }
++        */
+     }
+     // Leaves end - Lithium Sleeping Block Entity
+ }
+diff --git a/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.java b/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.java
+index 7f2b702ec1dfc900e87a8871944e7b7ad2896b5e..c24439227de102447cd7c4f36cb313b8a991364d 100644
+--- a/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.java
++++ b/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.java
+@@ -181,6 +181,8 @@ public abstract class AbstractFurnaceBlockEntity extends BaseContainerBlockEntit
+     }
+ 
+     public static void serverTick(ServerLevel level, BlockPos pos, BlockState state, AbstractFurnaceBlockEntity furnace) {
++        return;
++        /*
+         boolean isLit = furnace.isLit();
+         boolean flag = false;
+         if (furnace.isLit()) {
+@@ -272,6 +274,7 @@ public abstract class AbstractFurnaceBlockEntity extends BaseContainerBlockEntit
+             setChanged(level, pos, state);
+         }
+         if (org.leavesmc.leaves.LeavesConfig.performance.sleepingBlockEntity) furnace.checkSleep(state); // Leaves - Lithium Sleeping Block Entity
++        */
+     }
+ 
+     private static boolean canBurn(
+diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+index b67a1cacad31a93276988560ef03879a43c15aff..4b1f9c1846639e8517f3eacf31c0394aaeafca8b 100644
+--- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
++++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+@@ -166,6 +166,8 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+     }
+ 
+     public static void pushItemsTick(Level level, BlockPos pos, BlockState state, HopperBlockEntity blockEntity) {
++        return;
++        /*
+         blockEntity.cooldownTime--;
+         blockEntity.tickedGameTime = level.getGameTime();
+         if (!blockEntity.isOnCooldown()) {
+@@ -180,6 +182,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+             }
+             // Spigot end
+         }
++        */
+     }
+ 
+     // Paper start - Perf: Optimize Hoppers
