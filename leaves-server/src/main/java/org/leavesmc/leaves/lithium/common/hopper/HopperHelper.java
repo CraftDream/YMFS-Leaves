@@ -148,6 +148,10 @@ public class HopperHelper {
     }
 
     public static void updateHopperOnUpdateSuppression(Level level, BlockPos pos, int flags, LevelChunk worldChunk, boolean stateChange) {
+        if (worldChunk == null) {
+            return;
+        }
+
         if ((flags & Block.UPDATE_NEIGHBORS) == 0 && stateChange) {
             //No block updates were sent. We need to update nearby hoppers to avoid outdated inventory caches being used
 
