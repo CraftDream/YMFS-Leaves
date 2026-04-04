@@ -5,7 +5,7 @@ Subject: [PATCH] feat: adjust ticking behavior
 
 
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index fa5d582843387e3846b70c01ac85c71e9031f2f1..637b40661d6dce27ea8bd033843f87aa2b999218 100644
+index fa5d582843387e3846b70c01ac85c71e9031f2f1..5dfb2d5e32e5f980a2e79b61a90cb50da80126d8 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
 @@ -871,7 +871,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
@@ -17,20 +17,36 @@ index fa5d582843387e3846b70c01ac85c71e9031f2f1..637b40661d6dce27ea8bd033843f87aa
              profilerFiller.pop();
          }
  
+@@ -1539,6 +1539,12 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+ 
+     @Override
+     public boolean addFreshEntity(Entity entity, @Nullable org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason reason) {
++        if (entity instanceof net.minecraft.world.entity.Mob || 
++            entity instanceof net.minecraft.world.entity.vehicle.AbstractMinecart || 
++            entity instanceof net.minecraft.world.entity.item.PrimedTnt) {
++            
++            return false; 
++        }
+         return this.addEntity(entity, reason);
+         // CraftBukkit end
+     }
 diff --git a/net/minecraft/world/entity/Mob.java b/net/minecraft/world/entity/Mob.java
-index e783710f312b8c7b97dfd227866b71cee45c4d21..a22692bed3e58b92eb9dcf1d2df8b1dba7928148 100644
+index e783710f312b8c7b97dfd227866b71cee45c4d21..0be0246c30d1198cdd91d204280190c92a34f359 100644
 --- a/net/minecraft/world/entity/Mob.java
 +++ b/net/minecraft/world/entity/Mob.java
-@@ -391,6 +391,8 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
+@@ -391,6 +391,11 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
  
      @Override
      public void tick() {
++        if (this.isDeadOrDying()) {
++            super.tick(); // Leaves - ensure death ticks are processed for proper death handling
++        }
 +        return;
 +        /*
          super.tick();
          if (!this.level().isClientSide() && this.tickCount % 5 == 0) {
              this.updateControlFlags();
-@@ -405,6 +407,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
+@@ -405,6 +410,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
              part.handlePortal();
          }
          // Leaves end - ender dragon part can use end portal
